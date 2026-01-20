@@ -1,0 +1,29 @@
+# Node modules (server)
+server/node_modules/
+
+# Node modules 
+client/node_modules/
+
+# Environment files
+server/.env
+client/.env
+
+# Logs
+*.log
+server/*.log
+client/*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# NPM package lock 
+package-lock.json
