@@ -1,0 +1,33 @@
+<!--client/index.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Where’s Waldo</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+</head>
+<body>
+
+  <h1>Where’s Waldo</h1>
+
+  <div id="game-container">
+    <img
+      id="game-image"
+      src="assets/waldo.jpg"
+      alt="Where’s Waldo"
+    />
+
+    <!-- Target box -->
+    <div id="target-box" class="hidden">
+      <select id="character-select">
+        <option value="">Select character</option>
+        <option value="waldo">Waldo</option>
+        <option value="wizard">Wizard</option>
+        <option value="wilma">Wilma</option>
+      </select>
+    </div>
+  </div>
+
+  <script src="scripts/app.js"></script>
+</body>
+</html>

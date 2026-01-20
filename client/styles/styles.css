@@ -1,0 +1,27 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+#game-container {
+  position: relative;
+  display: inline-block;
+}
+
+#game-image {
+  max-width: 800px;
+  width: 100%;
+  cursor: crosshair;
+}
+
+#target-box {
+  position: absolute;
+  background: white;
+  border: 2px solid red;
+  padding: 5px;
+  z-index: 10;
+}
+
+.hidden {
+  display: none;
+}
