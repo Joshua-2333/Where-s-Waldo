@@ -1,23 +1,16 @@
 // server/controllers/gameController.js
+const pool = require("../db/pool");
 
-// Normalized coordinates for characters on THIS image
-const CHARACTERS = {
-  waldo: { x: 0.52, y: 0.21 },
-  wizard: { x: 0.31, y: 0.45 },
-  wilma: { x: 0.68, y: 0.33 },
-};
-
-// How close the click must be (normalized distance)
 const TOLERANCE = 0.03;
 
-exports.validateGuess = (req, res) => {
-  const { character, x, y } = req.body;
+exports.validateGuess = async (req, res) => {
+  const { character, x, y, imageFile } = req.body;
 
-  // Basic validation
   if (
     !character ||
     typeof x !== "number" ||
-    typeof y !== "number"
+    typeof y !== "number" ||
+    !imageFile
   ) {
     return res.status(400).json({
       correct: false,
@@ -25,18 +18,41 @@ exports.validateGuess = (req, res) => {
     });
   }
 
-  const target = CHARACTERS[character];
+  try {
+    const query = `
+      SELECT cl.x AS target_x, cl.y AS target_y
+      FROM character_locations cl
+      JOIN characters c ON c.id = cl.character_id
+      JOIN images i ON i.id = cl.image_id
+      WHERE c.name = $1
+      AND i.file_name = $2
+      LIMIT 1
+    `;
 
-  if (!target) {
-    return res.status(400).json({
+    const result = await pool.query(query, [
+      character,
+      imageFile,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        correct: false,
+        error: "Character not found for this image",
+      });
+    }
+
+    const { target_x, target_y } = result.rows[0];
+
+    const isCorrect =
+      Math.abs(x - target_x) <= TOLERANCE &&
+      Math.abs(y - target_y) <= TOLERANCE;
+
+    return res.json({ correct: isCorrect });
+  } catch (err) {
+    console.error("validateGuess error:", err);
+    return res.status(500).json({
       correct: false,
-      error: "Invalid character",
+      error: "Server error",
     });
   }
-
-  const isCorrect =
-    Math.abs(x - target.x) <= TOLERANCE &&
-    Math.abs(y - target.y) <= TOLERANCE;
-
-  return res.json({ correct: isCorrect });
 };

@@ -29,10 +29,11 @@
   <div id="game-container">
     <img
       id="game-image"
-      src="assets/waldo.jpg"
-      alt="Where’s Waldo"
+      src="assets/winter.jpg"
+      alt="Where’s Waldo Scene"
     />
 
+    <!-- Floating selector -->
     <div id="target-box" class="hidden">
       <select id="character-select">
         <option value="">Select character</option>
@@ -43,6 +44,8 @@
     </div>
   </div>
 
+  <!-- IMPORTANT: coords.js FIRST -->
+  <script type="module" src="scripts/coords.js"></script>
   <script type="module" src="scripts/app.js"></script>
 </body>
 </html>
