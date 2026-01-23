@@ -1,5 +1,7 @@
 // client/scripts/api.js
-export async function validateGuess(character, x, y, imageFile) {
+// client/scripts/api.js
+
+export async function validateGuess(character, x, y, imageName) {
   const response = await fetch("http://localhost:3000/api/game/validate", {
     method: "POST",
     headers: {
@@ -9,7 +11,7 @@ export async function validateGuess(character, x, y, imageFile) {
       character: character.toLowerCase(),
       x,
       y,
-      imageFile,
+      imageName, // ✅ MUST match images.name in DB
     }),
   });
 

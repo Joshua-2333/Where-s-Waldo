@@ -1,54 +1,94 @@
 /* client/styles/styles.css */
+/* =========================
+   GLOBAL
+========================= */
 body {
+  margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
   text-align: center;
+  background: #f5f5f5;
 }
 
+h1 {
+  margin: 20px 0;
+}
+
+/* =========================
+   CHARACTERS BAR
+========================= */
 #characters {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 15px;
+  gap: 24px;
+  margin-bottom: 20px;
 }
 
 .character {
   text-align: center;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.2s ease;
 }
 
 .character img {
   width: 60px;
+  height: auto;
+}
+
+.character p {
+  margin: 5px 0 0;
+  font-size: 14px;
 }
 
 .character.found {
   opacity: 0.4;
+  transform: scale(0.95);
 }
 
+/* =========================
+   GAME CONTAINER
+========================= */
 #game-container {
   position: relative;
-  display: inline-block;
+  margin: 0 auto;
+  width: fit-content;   /* IMPORTANT */
+  margin-bottom: 40px;
 }
 
+/* BIG, RESPONSIVE IMAGE */
 #game-image {
-  max-width: 800px;
-  width: 100%;
+  width: 95vw;          /* Fill most of screen */
+  max-width: 1600px;    /* Large but safe */
+  height: auto;
   cursor: crosshair;
+  display: block;
+  border-radius: 4px;
 }
 
+/* =========================
+   TARGET SELECT BOX
+========================= */
 #target-box {
   position: absolute;
   transform: translate(-50%, -50%);
   background: white;
   border: 2px solid red;
-  padding: 5px;
+  padding: 6px;
   z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+#target-box select {
+  font-size: 14px;
+  padding: 4px;
 }
 
 .hidden {
   display: none;
 }
 
-/* Permanent marker */
+/* =========================
+   PERMANENT MARKERS
+========================= */
 .marker {
   position: absolute;
   width: 40px;
@@ -59,7 +99,51 @@ body {
   pointer-events: none;
   z-index: 9999;
 
-  /* DEBUG ONLY - remove after confirmed working */
+  /* DEBUG VISUAL — remove later */
   background: rgba(0, 255, 0, 0.15);
   box-sizing: border-box;
+}
+
+/* LEVEL SELECT SCREEN */
+#level-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.level-card {
+  width: 280px;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.level-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.level-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: left;
+}
+
+.level-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.35);
 }

@@ -6,7 +6,34 @@ const targetBox = document.getElementById("target-box");
 const select = document.getElementById("character-select");
 const gameContainer = document.getElementById("game-container");
 
-const IMAGE_FILE = "winter.jpg";
+// 🚨 Get scene from URL (default to winter)
+const params = new URLSearchParams(window.location.search);
+const scene = params.get("scene") || "winter";
+
+/**
+ * 🔥 Scene → image filename (frontend only)
+ */
+const SCENE_TO_FILE = {
+  winter: "winter.jpg",
+  beach: "beach.jpeg",
+  space: "space.jpg",
+};
+
+/**
+ * 🔥 Scene → image name in DATABASE
+ * THIS is what the backend expects
+ */
+const SCENE_TO_IMAGE_NAME = {
+  winter: "Waldo Level 1",
+  beach: "Beach Scene",
+  space: "Space Scene",
+};
+
+const IMAGE_FILE = SCENE_TO_FILE[scene] || "winter.jpg";
+const IMAGE_NAME = SCENE_TO_IMAGE_NAME[scene] || "Waldo Level 1";
+
+// Set the image source
+image.src = `assets/${IMAGE_FILE}`;
 
 let lastClick = null;
 let clickLocked = false;
@@ -17,15 +44,14 @@ const foundCharacters = new Set();
  */
 function drawMarker(x, y, color = "green", temporary = false) {
   const rect = image.getBoundingClientRect();
-  const size = 36;
+  const containerRect = gameContainer.getBoundingClientRect();
 
   const marker = document.createElement("div");
   marker.classList.add("marker");
   marker.style.borderColor = color;
 
-  // Correct positioning with transform
-  marker.style.left = `${x * rect.width}px`;
-  marker.style.top = `${y * rect.height}px`;
+  marker.style.left = `${(rect.left - containerRect.left) + x * rect.width}px`;
+  marker.style.top = `${(rect.top - containerRect.top) + y * rect.height}px`;
 
   gameContainer.appendChild(marker);
 
@@ -41,13 +67,15 @@ image.addEventListener("click", (e) => {
   if (clickLocked) return;
 
   const rect = image.getBoundingClientRect();
+  const containerRect = gameContainer.getBoundingClientRect();
+
   const x = (e.clientX - rect.left) / rect.width;
   const y = (e.clientY - rect.top) / rect.height;
 
   lastClick = { x, y };
 
-  targetBox.style.left = `${x * rect.width}px`;
-  targetBox.style.top = `${y * rect.height}px`;
+  targetBox.style.left = `${(rect.left - containerRect.left) + x * rect.width}px`;
+  targetBox.style.top = `${(rect.top - containerRect.top) + y * rect.height}px`;
   targetBox.classList.remove("hidden");
 
   clickLocked = true;
@@ -68,7 +96,7 @@ select.addEventListener("change", async (e) => {
     return;
   }
 
-  // 🔴 Show red marker immediately
+  // 🔴 Immediate feedback
   drawMarker(lastClick.x, lastClick.y, "red", true);
 
   try {
@@ -76,7 +104,7 @@ select.addEventListener("change", async (e) => {
       character,
       lastClick.x,
       lastClick.y,
-      IMAGE_FILE
+      IMAGE_NAME // ✅ DB image name, NOT filename
     );
 
     console.log("SERVER RESULT:", result);
@@ -114,7 +142,7 @@ select.addEventListener("change", async (e) => {
 });
 
 /**
- * Cancel on outside click
+ * Cancel selection on outside click
  */
 document.addEventListener("click", (e) => {
   if (!e.target.closest("#game-container")) {

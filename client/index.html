@@ -1,51 +1,39 @@
-<!--client/index.html-->
+<!-- client/index.html -->
+<!-- client/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Where’s Waldo</title>
+  <title>Where’s Waldo - Select Level</title>
   <link rel="stylesheet" href="styles/styles.css" />
 </head>
 <body>
+  <h1>Select Your Scene</h1>
 
-  <h1>Where’s Waldo</h1>
-
-  <!-- Characters to find -->
-  <div id="characters">
-    <div class="character" data-character="waldo">
-      <img src="assets/waldo.jpg" alt="Waldo">
-      <p>Waldo</p>
+  <div id="level-grid">
+    <div class="level-card" data-scene="winter">
+      <img src="assets/winter.jpg" alt="Winter Scene">
+      <div class="level-title">Winter Scene</div>
     </div>
-    <div class="character" data-character="wizard">
-      <img src="assets/wizard.png" alt="Wizard">
-      <p>Wizard</p>
-    </div>
-    <div class="character" data-character="wilma">
-      <img src="assets/wilma.jpg" alt="Wilma">
-      <p>Wilma</p>
-    </div>
-  </div>
 
-  <div id="game-container">
-    <img
-      id="game-image"
-      src="assets/winter.jpg"
-      alt="Where’s Waldo Scene"
-    />
+    <div class="level-card" data-scene="beach">
+      <img src="assets/beach.jpeg" alt="Beach Scene">
+      <div class="level-title">Beach Scene</div>
+    </div>
 
-    <!-- Floating selector -->
-    <div id="target-box" class="hidden">
-      <select id="character-select">
-        <option value="">Select character</option>
-        <option value="waldo">Waldo</option>
-        <option value="wizard">Wizard</option>
-        <option value="wilma">Wilma</option>
-      </select>
+    <div class="level-card" data-scene="space">
+      <img src="assets/space.jpg" alt="Space Scene">
+      <div class="level-title">Space Scene</div>
     </div>
   </div>
 
-  <!-- IMPORTANT: coords.js FIRST -->
-  <script type="module" src="scripts/coords.js"></script>
-  <script type="module" src="scripts/app.js"></script>
+  <script>
+    document.querySelectorAll(".level-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const scene = card.getAttribute("data-scene");
+        window.location.href = `game.html?scene=${scene}`;
+      });
+    });
+  </script>
 </body>
 </html>

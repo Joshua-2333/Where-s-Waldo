@@ -4,13 +4,13 @@ const pool = require("../db/pool");
 const TOLERANCE = 0.03;
 
 exports.validateGuess = async (req, res) => {
-  const { character, x, y, imageFile } = req.body;
+  const { character, x, y, imageName } = req.body;
 
   if (
     !character ||
     typeof x !== "number" ||
     typeof y !== "number" ||
-    !imageFile
+    !imageName
   ) {
     return res.status(400).json({
       correct: false,
@@ -25,13 +25,13 @@ exports.validateGuess = async (req, res) => {
       JOIN characters c ON c.id = cl.character_id
       JOIN images i ON i.id = cl.image_id
       WHERE c.name = $1
-      AND i.file_name = $2
+      AND i.name = $2
       LIMIT 1
     `;
 
     const result = await pool.query(query, [
       character,
-      imageFile,
+      imageName,
     ]);
 
     if (result.rows.length === 0) {
