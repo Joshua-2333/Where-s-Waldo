@@ -1,6 +1,4 @@
 // client/scripts/api.js
-// client/scripts/api.js
-
 export async function validateGuess(character, x, y, imageName) {
   const response = await fetch("http://localhost:3000/api/game/validate", {
     method: "POST",
@@ -11,18 +9,39 @@ export async function validateGuess(character, x, y, imageName) {
       character: character.toLowerCase(),
       x,
       y,
-      imageName, // ✅ MUST match images.name in DB
+      imageName, // MUST match images.name in DB
     }),
   });
 
-  console.log("API STATUS:", response.status);
-
   const data = await response.json();
-  console.log("API RESPONSE:", data);
 
   if (!response.ok) {
     throw new Error("Server validation failed");
   }
 
+  return data;
+}
+
+
+// ----------------------
+// LEADERBOARD API
+// ----------------------
+
+export async function postScore(name, scene, timeSeconds) {
+  const response = await fetch("http://localhost:3000/api/scores", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, scene, time: timeSeconds }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to post score");
+  return data;
+}
+
+export async function getLeaderboard(scene) {
+  const response = await fetch(`http://localhost:3000/api/scores/${scene}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to fetch leaderboard");
   return data;
 }

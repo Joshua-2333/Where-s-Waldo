@@ -1,10 +1,10 @@
 // server/app.js
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
 const gameRoutes = require('./routes/gameRoutes');
+const scoreRoutes = require('./routes/scoreRoutes');
 
 const app = express();
 
@@ -18,5 +18,6 @@ app.get('/', (req, res) => {
 
 // API routes
 app.use('/api/game', gameRoutes);
+app.use('/api/scores', scoreRoutes);
 
 module.exports = app;

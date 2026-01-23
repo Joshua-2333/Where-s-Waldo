@@ -1,5 +1,4 @@
 <!-- client/index.html -->
-<!-- client/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,13 +26,44 @@
     </div>
   </div>
 
+  <!-- NAME ENTRY MODAL -->
+  <div id="name-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Enter Your Name</h2>
+      <input
+        id="player-name-input"
+        type="text"
+        placeholder="Your name"
+        maxlength="20"
+        aria-label="Player name"
+      />
+      <button id="start-game-btn">Start Game</button>
+    </div>
+  </div>
+
   <script>
-    document.querySelectorAll(".level-card").forEach(card => {
-      card.addEventListener("click", () => {
-        const scene = card.getAttribute("data-scene");
-        window.location.href = `game.html?scene=${scene}`;
-      });
+  let selectedScene = null;
+
+  document.querySelectorAll(".level-card").forEach(card => {
+    card.addEventListener("click", () => {
+      selectedScene = card.dataset.scene;
+      document.getElementById("name-modal").classList.remove("hidden");
+      document.getElementById("player-name-input").focus();
     });
-  </script>
+  });
+
+  document.getElementById("start-game-btn").addEventListener("click", () => {
+    const input = document.getElementById("player-name-input");
+    const name = input.value.trim();
+
+    if (!name || !selectedScene) return;
+
+    sessionStorage.setItem("playerName", name);
+    sessionStorage.setItem("scene", selectedScene);
+
+    window.location.href = `game.html?scene=${selectedScene}`;
+  });
+</script>
+
 </body>
 </html>

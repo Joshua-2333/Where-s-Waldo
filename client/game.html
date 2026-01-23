@@ -10,41 +10,29 @@
 
   <h1>Where’s Waldo</h1>
 
-  <!-- BACK BUTTON -->
   <a href="index.html" id="back-btn">⬅ Back to Scenes</a>
 
-  <!-- TIMER -->
   <div id="timer">Time: 00:00</div>
 
-  <!-- Toast message (fade in/out, non-blocking) -->
-  <div
-    id="toast"
-    aria-live="polite"
-    aria-atomic="true"
-  ></div>
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Win Message -->
   <div id="win-message" class="hidden">
     🎉 You found everyone! 🎉
   </div>
 
-  <!-- Characters to find -->
   <div id="characters">
     <div class="character" data-character="waldo">
       <img src="assets/waldo.jpg" alt="Waldo">
       <p>Waldo</p>
     </div>
-
     <div class="character" data-character="wizard">
       <img src="assets/wizard.png" alt="Wizard">
       <p>Wizard</p>
     </div>
-
     <div class="character" data-character="wilma">
       <img src="assets/wilma.jpg" alt="Wilma">
       <p>Wilma</p>
     </div>
-
     <div class="character" data-character="odlaw">
       <img src="assets/odlaw.jpg" alt="Odlaw">
       <p>Odlaw</p>
@@ -52,13 +40,8 @@
   </div>
 
   <div id="game-container">
-    <img
-      id="game-image"
-      src="assets/winter.jpg"
-      alt="Where’s Waldo Scene"
-    />
+    <img id="game-image" alt="Where’s Waldo Scene" />
 
-    <!-- Floating selector -->
     <div id="target-box" class="hidden">
       <select id="character-select">
         <option value="">Select character</option>
@@ -70,7 +53,26 @@
     </div>
   </div>
 
-  <!-- IMPORTANT: coords.js FIRST -->
+  <!-- LEADERBOARD MODAL -->
+  <div id="leaderboard-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content leaderboard">
+      <h2>Leaderboard</h2>
+      <ul id="leaderboard-list"></ul>
+
+      <div class="leaderboard-buttons">
+        <button id="replay-btn">Replay</button>
+        <button id="home-btn">Home</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const name = sessionStorage.getItem("playerName");
+    if (!name) {
+      window.location.href = "index.html";
+    }
+  </script>
+
   <script type="module" src="scripts/coords.js"></script>
   <script type="module" src="scripts/app.js"></script>
 </body>
