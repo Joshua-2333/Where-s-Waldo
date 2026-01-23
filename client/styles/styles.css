@@ -15,6 +15,49 @@ h1 {
 }
 
 /* =========================
+   BACK BUTTON
+========================= */
+#back-btn {
+  display: inline-block;
+  margin-bottom: 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  border: 2px solid #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+#back-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* =========================
+   TIMER
+========================= */
+#timer {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   WIN MESSAGE
+========================= */
+#win-message {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2e7d32;
+  margin: 12px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+/* =========================
    CHARACTERS BAR
 ========================= */
 #characters {
@@ -80,10 +123,6 @@ h1 {
 #target-box select {
   font-size: 14px;
   padding: 4px;
-}
-
-.hidden {
-  display: none;
 }
 
 /* =========================

@@ -1,10 +1,14 @@
 // client/scripts/app.js
 import { validateGuess } from "./api.js";
+import confetti from "https://cdn.skypack.dev/canvas-confetti";
 
 const image = document.getElementById("game-image");
 const targetBox = document.getElementById("target-box");
 const select = document.getElementById("character-select");
 const gameContainer = document.getElementById("game-container");
+
+const timerEl = document.getElementById("timer");
+const winMessage = document.getElementById("win-message");
 
 // 🚨 Get scene from URL (default to winter)
 const params = new URLSearchParams(window.location.search);
@@ -39,6 +43,45 @@ let lastClick = null;
 let clickLocked = false;
 const foundCharacters = new Set();
 
+let seconds = 0;
+let timerInterval = null;
+
+/**
+ * Timer
+ */
+function startTimer() {
+  timerInterval = setInterval(() => {
+    seconds++;
+    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+    timerEl.textContent = `Time: ${mins}:${secs}`;
+  }, 1000);
+}
+
+/**
+ * Stop timer
+ */
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+/**
+ * Win condition
+ */
+function checkWin() {
+  if (foundCharacters.size === 4) {
+    stopTimer();
+    winMessage.classList.remove("hidden");
+
+    // CONFETTI
+    confetti({
+      particleCount: 200,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
+}
+
 /**
  * Draw marker
  */
@@ -59,6 +102,11 @@ function drawMarker(x, y, color = "green", temporary = false) {
     setTimeout(() => marker.remove(), 800);
   }
 }
+
+/**
+ * Start timer when game loads
+ */
+startTimer();
 
 /**
  * Handle image click
@@ -127,6 +175,9 @@ select.addEventListener("change", async (e) => {
       if (card) card.classList.add("found");
 
       alert(`${character.toUpperCase()} FOUND 🎉`);
+
+      // CHECK WIN
+      checkWin();
     } else {
       alert("Close, but not quite 👀");
     }
