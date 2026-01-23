@@ -1,7 +1,5 @@
 /* client/styles/styles.css */
-/* =========================
-   GLOBAL
-========================= */
+/*GLOBAL*/
 body {
   margin: 0;
   padding: 0;
@@ -14,9 +12,7 @@ h1 {
   margin: 20px 0;
 }
 
-/* =========================
-   BACK BUTTON
-========================= */
+/*BACK BUTTON*/
 #back-btn {
   display: inline-block;
   margin-bottom: 15px;
@@ -34,18 +30,14 @@ h1 {
   color: #fff;
 }
 
-/* =========================
-   TIMER
-========================= */
+/*TIMER*/
 #timer {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 12px;
 }
 
-/* =========================
-   WIN MESSAGE
-========================= */
+/*WIN MESSAGE*/
 #win-message {
   font-size: 22px;
   font-weight: bold;
@@ -57,9 +49,7 @@ h1 {
   display: none;
 }
 
-/* =========================
-   CHARACTERS BAR
-========================= */
+/*CHARACTERS BAR*/
 #characters {
   display: flex;
   justify-content: center;
@@ -87,9 +77,7 @@ h1 {
   transform: scale(0.95);
 }
 
-/* =========================
-   GAME CONTAINER
-========================= */
+/*GAME CONTAINER*/
 #game-container {
   position: relative;
   margin: 0 auto;
@@ -100,16 +88,14 @@ h1 {
 /* BIG, RESPONSIVE IMAGE */
 #game-image {
   width: 95vw;          /* Fill most of screen */
-  max-width: 1600px;    /* Large but safe */
+  max-width: 1600px;    
   height: auto;
   cursor: crosshair;
   display: block;
   border-radius: 4px;
 }
 
-/* =========================
-   TARGET SELECT BOX
-========================= */
+/*TARGET SELECT BOX*/
 #target-box {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -125,9 +111,7 @@ h1 {
   padding: 4px;
 }
 
-/* =========================
-   PERMANENT MARKERS
-========================= */
+/*PERMANENT MARKERS*/
 .marker {
   position: absolute;
   width: 40px;
@@ -185,4 +169,49 @@ h1 {
 .level-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+}
+
+/* FADE MESSAGE (ACCESSIBLE, NON-BLOCKING) */
+#toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 2000;
+}
+
+#toast.show {
+  opacity: 1;
+}
+
+#toast.success {
+  background-color: #2e7d32;
+  color: #ffffff;
+}
+
+#toast.error {
+  background-color: #c62828;
+  color: #ffffff;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #toast {
+    transition: none;
+  }
+}
+
+/* MOBILE TWEAK */
+@media (max-width: 600px) {
+  #toast {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
 }

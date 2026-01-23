@@ -9,13 +9,14 @@ const gameContainer = document.getElementById("game-container");
 
 const timerEl = document.getElementById("timer");
 const winMessage = document.getElementById("win-message");
+const toast = document.getElementById("toast");
 
 // 🚨 Get scene from URL (default to winter)
 const params = new URLSearchParams(window.location.search);
 const scene = params.get("scene") || "winter";
 
 /**
- * 🔥 Scene → image filename (frontend only)
+ * Scene → image filename
  */
 const SCENE_TO_FILE = {
   winter: "winter.jpg",
@@ -24,8 +25,7 @@ const SCENE_TO_FILE = {
 };
 
 /**
- * 🔥 Scene → image name in DATABASE
- * THIS is what the backend expects
+ * Scene → DB image name
  */
 const SCENE_TO_IMAGE_NAME = {
   winter: "Waldo Level 1",
@@ -36,7 +36,6 @@ const SCENE_TO_IMAGE_NAME = {
 const IMAGE_FILE = SCENE_TO_FILE[scene] || "winter.jpg";
 const IMAGE_NAME = SCENE_TO_IMAGE_NAME[scene] || "Waldo Level 1";
 
-// Set the image source
 image.src = `assets/${IMAGE_FILE}`;
 
 let lastClick = null;
@@ -58,11 +57,20 @@ function startTimer() {
   }, 1000);
 }
 
-/**
- * Stop timer
- */
 function stopTimer() {
   clearInterval(timerInterval);
+}
+
+/**
+ * Fade message (replaces alert)
+ */
+function showToast(message, type = "success") {
+  toast.textContent = message;
+  toast.className = `toast show ${type}`;
+
+  setTimeout(() => {
+    toast.className = "toast";
+  }, 1500);
 }
 
 /**
@@ -73,7 +81,6 @@ function checkWin() {
     stopTimer();
     winMessage.classList.remove("hidden");
 
-    // CONFETTI
     confetti({
       particleCount: 200,
       spread: 70,
@@ -103,9 +110,6 @@ function drawMarker(x, y, color = "green", temporary = false) {
   }
 }
 
-/**
- * Start timer when game loads
- */
 startTimer();
 
 /**
@@ -127,8 +131,6 @@ image.addEventListener("click", (e) => {
   targetBox.classList.remove("hidden");
 
   clickLocked = true;
-
-  console.log("CLICK:", lastClick);
 });
 
 /**
@@ -140,11 +142,10 @@ select.addEventListener("change", async (e) => {
   const character = e.target.value.toLowerCase();
 
   if (foundCharacters.has(character)) {
-    alert("Already found!");
+    showToast("Already found", "error");
     return;
   }
 
-  // 🔴 Immediate feedback
   drawMarker(lastClick.x, lastClick.y, "red", true);
 
   try {
@@ -152,10 +153,8 @@ select.addEventListener("change", async (e) => {
       character,
       lastClick.x,
       lastClick.y,
-      IMAGE_NAME // ✅ DB image name, NOT filename
+      IMAGE_NAME
     );
-
-    console.log("SERVER RESULT:", result);
 
     if (result.correct) {
       drawMarker(lastClick.x, lastClick.y, "lime");
@@ -174,16 +173,14 @@ select.addEventListener("change", async (e) => {
       );
       if (card) card.classList.add("found");
 
-      alert(`${character.toUpperCase()} FOUND 🎉`);
-
-      // CHECK WIN
+      showToast(`${character.toUpperCase()} found! 🎉`, "success");
       checkWin();
     } else {
-      alert("Close, but not quite 👀");
+      showToast("Close, but not quite 👀", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Server error");
+    showToast("Server error", "error");
   }
 
   targetBox.classList.add("hidden");
