@@ -2,31 +2,21 @@
 export async function validateGuess(character, x, y, imageName) {
   const response = await fetch("http://localhost:3000/api/game/validate", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       character: character.toLowerCase(),
       x,
       y,
-      imageName, // MUST match images.name in DB
+      imageName,
     }),
   });
 
   const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error("Server validation failed");
-  }
-
+  if (!response.ok) throw new Error("Server validation failed");
   return data;
 }
 
-
-// ----------------------
-// LEADERBOARD API
-// ----------------------
-
+//LEADERBOARD API
 export async function postScore(name, scene, timeSeconds) {
   const response = await fetch("http://localhost:3000/api/scores", {
     method: "POST",
@@ -42,6 +32,13 @@ export async function postScore(name, scene, timeSeconds) {
 export async function getLeaderboard(scene) {
   const response = await fetch(`http://localhost:3000/api/scores/${scene}`);
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to fetch leaderboard");
+  if (!response.ok) throw new Error("Failed to fetch leaderboard");
+  return data;
+}
+
+export async function getGlobalLeaderboard() {
+  const response = await fetch("http://localhost:3000/api/scores/global");
+  const data = await response.json();
+  if (!response.ok) throw new Error("Failed to fetch global leaderboard");
   return data;
 }

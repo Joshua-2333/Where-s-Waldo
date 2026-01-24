@@ -13,6 +13,11 @@ const toast = document.getElementById("toast");
 
 const leaderboardModal = document.getElementById("leaderboard-modal");
 const leaderboardList = document.getElementById("leaderboard-list");
+const leaderboardTitle = document.getElementById("leaderboard-title");
+const leaderboardLoading = document.getElementById("leaderboard-loading");
+const bestBadge = document.getElementById("best-badge");
+
+const rotateOverlay = document.getElementById("rotate-overlay");
 
 const playerName = sessionStorage.getItem("playerName") || "Player";
 
@@ -31,6 +36,12 @@ const SCENE_TO_IMAGE_NAME = {
   space: "Space Scene",
 };
 
+const SCENE_TO_TITLE = {
+  winter: "Winter Scene",
+  beach: "Beach Scene",
+  space: "Space Scene",
+};
+
 image.src = `assets/${SCENE_TO_FILE[scene]}`;
 
 let lastClick = null;
@@ -40,6 +51,23 @@ const foundCharacters = new Set();
 let seconds = 0;
 let timerInterval = null;
 
+/*LANDSCAPE LOCK*/
+function checkOrientation() {
+  const isMobile = window.innerWidth < 1024;
+  const isPortrait = window.innerHeight > window.innerWidth;
+
+  if (isMobile && isPortrait) {
+    rotateOverlay.classList.add("show");
+  } else {
+    rotateOverlay.classList.remove("show");
+  }
+}
+
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
+checkOrientation();
+
+/*TIMER*/
 function startTimer() {
   timerInterval = setInterval(() => {
     seconds++;
@@ -68,26 +96,69 @@ function formatTime(seconds) {
   return `${mins}:${secs}`;
 }
 
-async function showLeaderboard() {
+/*LEADERBOARD*/
+async function showLeaderboard(finalTime) {
+  leaderboardTitle.textContent = `${SCENE_TO_TITLE[scene]} Leaderboard`;
+  leaderboardModal.classList.remove("hidden");
+  leaderboardModal.setAttribute("aria-hidden", "false");
+
+  leaderboardLoading.classList.remove("hidden");
+  leaderboardList.innerHTML = "";
+  bestBadge.classList.add("hidden");
+
   try {
     const scores = await getLeaderboard(scene);
 
-    leaderboardList.innerHTML = "";
+    leaderboardLoading.classList.add("hidden");
 
-    scores.forEach((score) => {
+    const bestTime = scores[0]?.time_seconds ?? Infinity;
+    if (finalTime < bestTime) {
+      bestBadge.classList.remove("hidden");
+    }
+
+    scores.forEach((score, i) => {
       const li = document.createElement("li");
+      li.style.animationDelay = `${i * 0.05}s`;
       li.innerHTML = `<span>${score.name}</span><span>${formatTime(score.time_seconds)}</span>`;
+
+      // Highlight player's own score
+      if (score.name === playerName && score.time_seconds === finalTime) {
+        li.classList.add("highlight");
+      }
+
       leaderboardList.appendChild(li);
     });
 
-    leaderboardModal.classList.remove("hidden");
-    leaderboardModal.setAttribute("aria-hidden", "false");
   } catch (err) {
     console.error(err);
-    showToast("Leaderboard failed", "error");
+    leaderboardLoading.classList.add("hidden");
+    showToast("Leaderboard failed — using local fallback", "error");
+
+    const fallback = getLocalScores(scene);
+    fallback.push({ name: playerName, time_seconds: finalTime });
+    fallback.sort((a, b) => a.time_seconds - b.time_seconds);
+    setLocalScores(scene, fallback);
+
+    bestBadge.classList.remove("hidden");
+
+    fallback.forEach((score, i) => {
+      const li = document.createElement("li");
+      li.style.animationDelay = `${i * 0.05}s`;
+      li.innerHTML = `<span>${score.name}</span><span>${formatTime(score.time_seconds)}</span>`;
+      leaderboardList.appendChild(li);
+    });
   }
 }
 
+function getLocalScores(scene) {
+  return JSON.parse(localStorage.getItem(`scores_${scene}`)) || [];
+}
+
+function setLocalScores(scene, scores) {
+  localStorage.setItem(`scores_${scene}`, JSON.stringify(scores.slice(0, 10)));
+}
+
+/*WIN CHECK*/
 function checkWin() {
   if (foundCharacters.size === 4) {
     stopTimer();
@@ -100,11 +171,15 @@ function checkWin() {
     });
 
     postScore(playerName, scene, seconds)
-      .then(() => showLeaderboard())
-      .catch(() => showToast("Could not save score", "error"));
+      .then(() => showLeaderboard(seconds))
+      .catch(() => {
+        showToast("Could not save score to server", "error");
+        showLeaderboard(seconds);
+      });
   }
 }
 
+/*DRAW MARKER*/
 function drawMarker(x, y, color = "green", temporary = false) {
   const rect = image.getBoundingClientRect();
   const containerRect = gameContainer.getBoundingClientRect();
@@ -122,6 +197,7 @@ function drawMarker(x, y, color = "green", temporary = false) {
 
 startTimer();
 
+/*CLICK + SELECT LOGIC*/
 image.addEventListener("click", (e) => {
   if (clickLocked) return;
 

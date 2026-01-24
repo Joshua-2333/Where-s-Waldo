@@ -42,28 +42,27 @@
   </div>
 
   <script>
-  let selectedScene = null;
+    let selectedScene = null;
 
-  document.querySelectorAll(".level-card").forEach(card => {
-    card.addEventListener("click", () => {
-      selectedScene = card.dataset.scene;
-      document.getElementById("name-modal").classList.remove("hidden");
-      document.getElementById("player-name-input").focus();
+    document.querySelectorAll(".level-card").forEach(card => {
+      card.addEventListener("click", () => {
+        selectedScene = card.dataset.scene;
+        document.getElementById("name-modal").classList.remove("hidden");
+        document.getElementById("player-name-input").focus();
+      });
     });
-  });
 
-  document.getElementById("start-game-btn").addEventListener("click", () => {
-    const input = document.getElementById("player-name-input");
-    const name = input.value.trim();
+    document.getElementById("start-game-btn").addEventListener("click", () => {
+      const input = document.getElementById("player-name-input");
+      const name = input.value.trim();
 
-    if (!name || !selectedScene) return;
+      if (!name) return;
 
-    sessionStorage.setItem("playerName", name);
-    sessionStorage.setItem("scene", selectedScene);
+      sessionStorage.setItem("playerName", name);
+      sessionStorage.setItem("scene", selectedScene);
 
-    window.location.href = `game.html?scene=${selectedScene}`;
-  });
-</script>
-
+      window.location.href = `game.html?scene=${selectedScene}`;
+    });
+  </script>
 </body>
 </html>

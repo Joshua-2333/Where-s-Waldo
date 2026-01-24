@@ -56,13 +56,32 @@
   <!-- LEADERBOARD MODAL -->
   <div id="leaderboard-modal" class="modal hidden" aria-hidden="true">
     <div class="modal-content leaderboard">
-      <h2>Leaderboard</h2>
+      <h2 id="leaderboard-title">Leaderboard</h2>
+
+      <!-- Loading state -->
+      <div id="leaderboard-loading" class="hidden">
+        Loading leaderboard...
+      </div>
+
       <ul id="leaderboard-list"></ul>
+
+      <!-- New Best Time badge -->
+      <div id="best-badge" class="hidden">
+        🏆 New Best Time!
+      </div>
 
       <div class="leaderboard-buttons">
         <button id="replay-btn">Replay</button>
         <button id="home-btn">Home</button>
       </div>
+    </div>
+  </div>
+
+  <!-- LANDSCAPE ONLY OVERLAY -->
+  <div id="rotate-overlay">
+    <div>
+      <h2>🔄 Rotate Your Device</h2>
+      <p>Please play in landscape mode for the best experience.</p>
     </div>
   </div>
 
