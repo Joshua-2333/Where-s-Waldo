@@ -260,11 +260,23 @@ select.addEventListener("change", async (e) => {
     console.error(err);
     showToast("Server error", "error");
   } finally {
+    // ✅ ALWAYS reset the click lock
     targetBox.classList.add("hidden");
     select.value = "";
     lastClick = null;
     clickLocked = false;
   }
+});
+
+/* CANCEL CLICK (click outside to close) */
+document.addEventListener("click", (e) => {
+  if (!clickLocked) return;
+  if (targetBox.contains(e.target) || e.target === image) return;
+
+  targetBox.classList.add("hidden");
+  select.value = "";
+  lastClick = null;
+  clickLocked = false;
 });
 
 document.getElementById("replay-btn").addEventListener("click", () => {

@@ -1,5 +1,8 @@
-// server/server.js
-const app = require('./app');
+const app = require("./app");
+
+// ADD DEBUG ROUTES
+const debugRouter = require("./routes/debug");
+app.use("/debug", debugRouter);
 
 const PORT = process.env.PORT || 3000;
 
