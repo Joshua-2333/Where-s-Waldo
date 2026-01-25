@@ -31,7 +31,7 @@ const SCENE_TO_FILE = {
 };
 
 const SCENE_TO_IMAGE_NAME = {
-  winter: "Waldo Level 1",
+  winter: "Winter Scene",
   beach: "Beach Scene",
   space: "Space Scene",
 };
@@ -51,23 +51,18 @@ const foundCharacters = new Set();
 let seconds = 0;
 let timerInterval = null;
 
-/*LANDSCAPE LOCK*/
+/* ===== ORIENTATION LOCK ===== */
 function checkOrientation() {
   const isMobile = window.innerWidth < 1024;
   const isPortrait = window.innerHeight > window.innerWidth;
-
-  if (isMobile && isPortrait) {
-    rotateOverlay.classList.add("show");
-  } else {
-    rotateOverlay.classList.remove("show");
-  }
+  rotateOverlay.classList.toggle("show", isMobile && isPortrait);
 }
 
 window.addEventListener("resize", checkOrientation);
 window.addEventListener("orientationchange", checkOrientation);
 checkOrientation();
 
-/*TIMER*/
+/* ===== TIMER ===== */
 function startTimer() {
   timerInterval = setInterval(() => {
     seconds++;
@@ -81,13 +76,11 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
+/* ===== UI HELPERS ===== */
 function showToast(message, type = "success") {
   toast.textContent = message;
   toast.className = `toast show ${type}`;
-
-  setTimeout(() => {
-    toast.className = "toast";
-  }, 1500);
+  setTimeout(() => (toast.className = "toast"), 1500);
 }
 
 function formatTime(seconds) {
@@ -96,107 +89,79 @@ function formatTime(seconds) {
   return `${mins}:${secs}`;
 }
 
-/*LEADERBOARD*/
+/* ===== LEADERBOARD ===== */
 async function showLeaderboard(finalTime) {
   leaderboardTitle.textContent = `${SCENE_TO_TITLE[scene]} Leaderboard`;
   leaderboardModal.classList.remove("hidden");
-  leaderboardModal.setAttribute("aria-hidden", "false");
-
   leaderboardLoading.classList.remove("hidden");
   leaderboardList.innerHTML = "";
   bestBadge.classList.add("hidden");
 
   try {
     const scores = await getLeaderboard(scene);
-
     leaderboardLoading.classList.add("hidden");
 
     const bestTime = scores[0]?.time_seconds ?? Infinity;
-    if (finalTime < bestTime) {
-      bestBadge.classList.remove("hidden");
-    }
+    if (finalTime < bestTime) bestBadge.classList.remove("hidden");
 
     scores.forEach((score, i) => {
       const li = document.createElement("li");
       li.style.animationDelay = `${i * 0.05}s`;
       li.innerHTML = `<span>${score.name}</span><span>${formatTime(score.time_seconds)}</span>`;
-
       if (score.name === playerName && score.time_seconds === finalTime) {
         li.classList.add("highlight");
       }
-
       leaderboardList.appendChild(li);
     });
-
-  } catch (err) {
-    console.error(err);
+  } catch {
     leaderboardLoading.classList.add("hidden");
-    showToast("Leaderboard failed — using local fallback", "error");
+    showToast("Leaderboard offline — using local", "error");
 
-    const fallback = getLocalScores(scene);
+    const fallback = JSON.parse(localStorage.getItem(`scores_${scene}`)) || [];
     fallback.push({ name: playerName, time_seconds: finalTime });
     fallback.sort((a, b) => a.time_seconds - b.time_seconds);
-    setLocalScores(scene, fallback);
+    localStorage.setItem(`scores_${scene}`, JSON.stringify(fallback.slice(0, 10)));
 
     bestBadge.classList.remove("hidden");
-
-    fallback.forEach((score, i) => {
+    fallback.forEach((score) => {
       const li = document.createElement("li");
-      li.style.animationDelay = `${i * 0.05}s`;
       li.innerHTML = `<span>${score.name}</span><span>${formatTime(score.time_seconds)}</span>`;
       leaderboardList.appendChild(li);
     });
   }
 }
 
-function getLocalScores(scene) {
-  return JSON.parse(localStorage.getItem(`scores_${scene}`)) || [];
-}
-
-function setLocalScores(scene, scores) {
-  localStorage.setItem(`scores_${scene}`, JSON.stringify(scores.slice(0, 10)));
-}
-
-/*WIN CHECK*/
+/* ===== WIN CHECK ===== */
 function checkWin() {
   if (foundCharacters.size === 4) {
     stopTimer();
     winMessage.classList.remove("hidden");
 
-    confetti({
-      particleCount: 200,
-      spread: 80,
-      origin: { y: 0.6 }
-    });
+    confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
 
     postScore(playerName, scene, seconds)
-      .then(() => showLeaderboard(seconds))
-      .catch(() => {
-        showToast("Could not save score to server", "error");
-        showLeaderboard(seconds);
-      });
+      .finally(() => showLeaderboard(seconds));
   }
 }
 
-/*DRAW MARKER*/
+/* ===== MARKERS ===== */
 function drawMarker(x, y, color = "green", temporary = false) {
   const rect = image.getBoundingClientRect();
   const containerRect = gameContainer.getBoundingClientRect();
 
   const marker = document.createElement("div");
-  marker.classList.add("marker");
+  marker.className = "marker";
   marker.style.borderColor = color;
-  marker.style.left = `${(rect.left - containerRect.left) + x * rect.width}px`;
-  marker.style.top = `${(rect.top - containerRect.top) + y * rect.height}px`;
+  marker.style.left = `${rect.left - containerRect.left + x * rect.width}px`;
+  marker.style.top = `${rect.top - containerRect.top + y * rect.height}px`;
 
   gameContainer.appendChild(marker);
-
   if (temporary) setTimeout(() => marker.remove(), 800);
 }
 
 startTimer();
 
-/*CLICK + SELECT LOGIC*/
+/* ===== CLICK LOGIC ===== */
 image.addEventListener("click", (e) => {
   if (clickLocked) return;
 
@@ -205,13 +170,11 @@ image.addEventListener("click", (e) => {
 
   lastClick = {
     x: (e.clientX - rect.left) / rect.width,
-    y: (e.clientY - rect.top) / rect.height
+    y: (e.clientY - rect.top) / rect.height,
   };
 
-  targetBox.style.left =
-    (rect.left - containerRect.left) + lastClick.x * rect.width + "px";
-  targetBox.style.top =
-    (rect.top - containerRect.top) + lastClick.y * rect.height + "px";
+  targetBox.style.left = `${rect.left - containerRect.left + lastClick.x * rect.width}px`;
+  targetBox.style.top = `${rect.top - containerRect.top + lastClick.y * rect.height}px`;
 
   targetBox.classList.remove("hidden");
   clickLocked = true;
@@ -240,27 +203,13 @@ select.addEventListener("change", async (e) => {
     if (result.correct) {
       drawMarker(lastClick.x, lastClick.y, "lime");
       foundCharacters.add(character);
-
-      const option = select.querySelector(`option[value="${character}"]`);
-      if (option) {
-        option.disabled = true;
-        option.textContent += " ✓";
-      }
-
-      document
-        .querySelector(`.character[data-character="${character}"]`)
-        ?.classList.add("found");
-
+      select.querySelector(`option[value="${character}"]`).disabled = true;
       showToast(`${character.toUpperCase()} found! 🎉`);
       checkWin();
     } else {
       showToast("Close, but not quite 👀", "error");
     }
-  } catch (err) {
-    console.error(err);
-    showToast("Server error", "error");
   } finally {
-    // ✅ ALWAYS reset the click lock
     targetBox.classList.add("hidden");
     select.value = "";
     lastClick = null;
@@ -268,21 +217,5 @@ select.addEventListener("change", async (e) => {
   }
 });
 
-/* CANCEL CLICK (click outside to close) */
-document.addEventListener("click", (e) => {
-  if (!clickLocked) return;
-  if (targetBox.contains(e.target) || e.target === image) return;
-
-  targetBox.classList.add("hidden");
-  select.value = "";
-  lastClick = null;
-  clickLocked = false;
-});
-
-document.getElementById("replay-btn").addEventListener("click", () => {
-  window.location.reload();
-});
-
-document.getElementById("home-btn").addEventListener("click", () => {
-  window.location.href = "index.html";
-});
+document.getElementById("replay-btn").onclick = () => location.reload();
+document.getElementById("home-btn").onclick = () => (location.href = "index.html");

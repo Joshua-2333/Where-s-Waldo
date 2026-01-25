@@ -2,17 +2,15 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
-// Render Postgres requires SSL.
-// Detect Render by checking if DATABASE_URL includes "render.com"
-const isRender = process.env.DATABASE_URL?.includes("render.com");
+const isLocal = process.env.NODE_ENV !== "production";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: isRender
-    ? {
-        rejectUnauthorized: false,
-      }
-    : false,
+  connectionString: isLocal
+    ? process.env.LOCAL_DATABASE_URL
+    : process.env.DATABASE_URL,
+  ssl: isLocal
+    ? false
+    : { rejectUnauthorized: false },
 });
 
 module.exports = pool;

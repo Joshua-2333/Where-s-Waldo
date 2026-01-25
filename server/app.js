@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const gameRoutes = require('./routes/gameRoutes');
 const scoreRoutes = require('./routes/scoreRoutes');
+const debugRoutes = require('./routes/debug');
 
 const app = express();
 
@@ -15,6 +16,9 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Where’s Waldo API running');
 });
+
+// Debug routes
+app.use('/debug', debugRoutes);
 
 // API routes
 app.use('/api/game', gameRoutes);
