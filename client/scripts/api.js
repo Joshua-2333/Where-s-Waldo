@@ -1,6 +1,8 @@
 // client/scripts/api.js
+import { BASE_URL } from "../config.js";
+
 export async function validateGuess(character, x, y, imageName) {
-  const response = await fetch("http://localhost:3000/api/game/validate", {
+  const response = await fetch(`${BASE_URL}/api/game/validate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -16,9 +18,9 @@ export async function validateGuess(character, x, y, imageName) {
   return data;
 }
 
-//LEADERBOARD API
+// LEADERBOARD API
 export async function postScore(name, scene, timeSeconds) {
-  const response = await fetch("http://localhost:3000/api/scores", {
+  const response = await fetch(`${BASE_URL}/api/scores`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, scene, time: timeSeconds }),
@@ -30,15 +32,8 @@ export async function postScore(name, scene, timeSeconds) {
 }
 
 export async function getLeaderboard(scene) {
-  const response = await fetch(`http://localhost:3000/api/scores/${scene}`);
+  const response = await fetch(`${BASE_URL}/api/scores/${scene}`);
   const data = await response.json();
   if (!response.ok) throw new Error("Failed to fetch leaderboard");
-  return data;
-}
-
-export async function getGlobalLeaderboard() {
-  const response = await fetch("http://localhost:3000/api/scores/global");
-  const data = await response.json();
-  if (!response.ok) throw new Error("Failed to fetch global leaderboard");
   return data;
 }

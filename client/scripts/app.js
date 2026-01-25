@@ -121,7 +121,6 @@ async function showLeaderboard(finalTime) {
       li.style.animationDelay = `${i * 0.05}s`;
       li.innerHTML = `<span>${score.name}</span><span>${formatTime(score.time_seconds)}</span>`;
 
-      // Highlight player's own score
       if (score.name === playerName && score.time_seconds === finalTime) {
         li.classList.add("highlight");
       }

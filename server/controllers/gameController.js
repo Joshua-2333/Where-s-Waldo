@@ -6,6 +6,8 @@ const TOLERANCE = 0.03;
 exports.validateGuess = async (req, res) => {
   const { character, x, y, imageName } = req.body;
 
+  console.log("validateGuess body:", req.body);
+
   if (
     !character ||
     typeof x !== "number" ||
@@ -50,9 +52,10 @@ exports.validateGuess = async (req, res) => {
     return res.json({ correct: isCorrect });
   } catch (err) {
     console.error("validateGuess error:", err);
+
     return res.status(500).json({
       correct: false,
-      error: "Server error",
+      error: err.message || "Server error",
     });
   }
 };
