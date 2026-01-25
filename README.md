@@ -34,3 +34,7 @@ This is a **full-stack web application** with both a **frontend** and **backend*
 6. When you win, your time is saved and the leaderboard appears.
 
 ---
+
+## Demo
+
+https://wheres-waldo-frontend-zspk.onrender.com
